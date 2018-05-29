@@ -10,5 +10,8 @@
     ],
     "autoload": {
         "classmap": [ "JJG/Ping.php" ]
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.2"
     }
 }
