@@ -259,8 +259,18 @@ class Ping
 
         // Strip empty lines and reorder the indexes from 0 (to make results more
         // uniform across OS versions).
-        $this->commandOutput = implode($output, '');
+        $this->commandOutput = implode('', $output);
         $output = array_values(array_filter($output));
+
+        if ((int) $return !== 0) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Failed to execute the command "%s": "%s"',
+                    $exec_string,
+                    implode(PHP_EOL, $output)
+                )
+            );
+        }
 
         // If the result line in the output is not empty, parse it.
         if (!empty($output[1])) {
