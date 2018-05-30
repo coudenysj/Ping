@@ -262,7 +262,7 @@ class Ping
         $this->commandOutput = implode('', $output);
         $output = array_values(array_filter($output));
 
-        if ((int) $return !== 0) {
+        if ((int) $return > 1) {
             throw new \RuntimeException(
                 sprintf(
                     'Failed to execute the command "%s": "%s"',
