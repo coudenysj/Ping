@@ -236,22 +236,34 @@ class Ping
         $timeout = escapeshellcmd($this->timeout);
         $host = escapeshellcmd($this->host);
 
+        $isIpV6 = filter_var($host, FILTER_VALIDATE_EMAIL, FILTER_FLAG_IPV6);
+        $command = 'ping';
+
         // Exec string for Windows-based systems.
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            if ($isIpV6) {
+                $command .= ' -6';
+            }
             // -n = number of pings; -i = ttl; -w = timeout (in milliseconds).
-            $exec_string = 'ping -n 1 -i ' . $ttl . ' -w ' . ($timeout * 1000) . ' ' . $host;
+            $exec_string = $command . ' -n 1 -i ' . $ttl . ' -w ' . ($timeout * 1000) . ' ' . $host;
         } // Exec string for Darwin based systems (OS X).
         elseif (strtoupper(PHP_OS) === 'DARWIN') {
+            if ($isIpV6) {
+                $command .= '6';
+            }
             // -n = numeric output; -c = number of pings; -m = ttl; -t = timeout.
-            $exec_string = 'ping -n -c 1 -m ' . $ttl . ' -t ' . $timeout . ' ' . $host;
+            $exec_string = $command . ' -n -c 1 -m ' . $ttl . ' -t ' . $timeout . ' ' . $host;
         } // Exec string for other UNIX-based systems (Linux).
         else {
+            if ($isIpV6) {
+                $command .= '6';
+            }
             // -n = numeric output; -c = number of pings; -t = ttl; -W = timeout
-            $exec_string = 'ping -n -c 1 -t ' . $ttl . ' -W ' . $timeout . ' ' . $host . ' 2>&1';
+            $exec_string = $command . ' -n -c 1 -t ' . $ttl . ' -W ' . $timeout . ' ' . $host . ' 2>&1';
 
-            if (strpos(shell_exec('ping --help 2>&1'), '--ttl=') !== false) {
+            if (strpos(shell_exec($command . ' --help 2>&1'), '--ttl=') !== false) {
                 // -n = numeric output; -c = number of pings; --ttl = ttl; -W = timeout
-                $exec_string = 'ping -n -c 1 --ttl=' . $ttl . ' -W ' . $timeout . ' ' . $host . ' 2>&1';
+                $exec_string = $command . ' -n -c 1 --ttl=' . $ttl . ' -W ' . $timeout . ' ' . $host . ' 2>&1';
             }
         }
 
